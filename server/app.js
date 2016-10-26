@@ -8,12 +8,19 @@ var session = require('express-session');
 var localStrategy = require('passport-local');
 var mongoose = require('mongoose');
 
+// el models
+var defaultModel = require('./models/default.js')
+
 //routes
 var index = require('./routes/index.js')
+var default_value= require('./routes/default.js')
 
 //mongo stuff
-var mongoURI = process.env.MONGODB_URI || process.env.MONGOHQ_URL || "mongodb://localhost/dataFitDb";
+var mongoURI =    process.env.MONGODB_URI ||
+   process.env.MONGOHQ_URL ||
+   "mongodb://localhost/DataFitDb";
 var mongoDB = mongoose.connect(mongoURI).connection;
+var defaultsExist = null;
 
   //mongo setup things
   mongoDB.on('error', function(err){
@@ -21,8 +28,22 @@ var mongoDB = mongoose.connect(mongoURI).connection;
   });
   mongoDB.once('open', function(err){
         if(!err) {console.log('Mongo connection open');}
-        else if(err) {console.log('Got in but Connection is f**ked upt, connection: ', err);}
+        else if(err) {console.log('Got in but Connection is f**ked up, connection: ', err);}
     });
+    var conn = mongoose.createConnection(mongoURI);
+        conn.on('open', function(){
+        conn.db.listCollections().toArray(function(err, names){
+
+            console.log(names.length)
+            if(names.length==0){
+                defaultsExist = false;
+            }else{
+                defaultsExist = true;
+            }
+            conn.close();
+          });
+        });
+
 
 // Set port
 app.set('port', (process.env.PORT) || 1313);
@@ -76,7 +97,11 @@ app.use(bodyParser.urlencoded({extended: true}));
                                       });
                                   }
                               ));
-
+app.get('/checkDB', function(req, res){
+  console.log('defaultsExist = ', defaultsExist);
+  res.dend(defaultsExist)
+});
+app.use('/defaults', default_value);
 app.use('/',index);
 app.listen(app.get('port'),function(){
   console.log('We can hear on port #', app.get('port'))
