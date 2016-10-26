@@ -12,9 +12,7 @@ var mongoose = require('mongoose');
 var index = require('./routes/index.js')
 
 //mongo stuff
-var mongoURI = process.env.MONGODB_URI ||
-  process.env.MONGOHQ_URL ||
-  "mongodb://localhost/dataFitDb";
+var mongoURI = process.env.MONGODB_URI || process.env.MONGOHQ_URL || "mongodb://localhost/dataFitDb";
 var mongoDB = mongoose.connect(mongoURI).connection;
 
   //mongo setup things
