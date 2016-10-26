@@ -34,9 +34,10 @@ var defaultsExist = null;
         conn.on('open', function(){
         conn.db.listCollections().toArray(function(err, names){
 
-            console.log(names.length)
+
             if(names.length==0){
                 defaultsExist = false;
+                console.log(defaultsExist)
             }else{
                 defaultsExist = true;
             }
@@ -99,7 +100,7 @@ app.use(bodyParser.urlencoded({extended: true}));
                               ));
 app.get('/checkDB', function(req, res){
   console.log('defaultsExist = ', defaultsExist);
-  res.dend(defaultsExist)
+  res.send(defaultsExist)
 });
 app.use('/defaults', default_value);
 app.use('/',index);
